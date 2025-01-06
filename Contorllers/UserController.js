@@ -14,7 +14,7 @@ export const createUser = (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-
+  
   const { name, age } = req.body;
   console.log(`Received Name: ${name}, Age: ${age}`);
   res.status(201).json({ message: 'User created successfully', user: { name, age } });
