@@ -4,6 +4,17 @@ import { welcomeMessage, getUsers, createUser } from '../Contorllers/UserControl
 import UserValidation from '../Validations/UserValidaation.js';
 import adminMiddleware from '../Middleware/adminMiddleware.js';
 const router = Router();
+import connectToDatabase from './db.js';
+let db; // Store the database object globally
+
+connectToDatabase()
+  .then((database) => {
+    db = database;
+    console.log('Database connection established');
+  })
+  .catch((error) => {
+    console.error('Failed to connect to the database:', error);
+  });
 
 
 router.get('/', welcomeMessage);
