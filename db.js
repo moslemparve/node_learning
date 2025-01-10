@@ -1,27 +1,30 @@
 import { MongoClient } from 'mongodb';
 
-// MongoDB connection URI
 const uri = 'mongodb://127.0.0.1:27017';
 
-// Database and collection names
-const dbName = 'myDatabase';
+const dbName = 'node';
 
 const client = new MongoClient(uri);
+let db;
 
 async function connectToDatabase() {
   try {
-    // Connect to the MongoDB server
     await client.connect();
     console.log('Connected to MongoDB');
 
-    // Return the database object for use in other modules
-    const db = client.db(dbName);
+    db = client.db(dbName);
     return db;
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
-    throw error; // Re-throw the error for handling in the calling function
+    throw error;
   }
 }
 
-// Export the function
-export default connectToDatabase;
+function getDb() {
+  if (!db) {
+    throw new Error('Database not connected');
+  }
+  return db;
+}
+
+export { connectToDatabase, getDb };

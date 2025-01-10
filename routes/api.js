@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { body, validationResult } from 'express-validator';
-import { welcomeMessage, getUsers, createUser } from '../Contorllers/UserController.js';
+import { welcomeMessage, getUsers, createUser ,getUser,updateUser,deleteUser } from '../Contorllers/UserController.js';
 import UserValidation from '../Validations/UserValidaation.js';
 import adminMiddleware from '../Middleware/adminMiddleware.js';
 const router = Router();
-import connectToDatabase from './db.js';
-let db; // Store the database object globally
+import {connectToDatabase} from '../db.js';
+let db; 
 
 connectToDatabase()
   .then((database) => {
@@ -19,10 +18,11 @@ connectToDatabase()
 
 router.get('/', welcomeMessage);
 
-router.get('/users',getUsers);
-
-router.post('/users',UserValidation,createUser);
-
+router.get('/get/users',(req, res) => getUsers(req, res, db));
+router.post('/create/user', UserValidation, (req, res) => createUser(req, res, db));
+router.get('/get/user/:id', (req, res) => getUser(req, res, db));
+router.post('/update/user/:id', UserValidation, (req, res) => updateUser(req, res, db));
+router.delete('/delete/user/:id', (req, res) => deleteUser(req, res, db));
 router.get('/admin', adminMiddleware('admin'), (req, res) => {
     res.json({ message: 'Welcome Admin' });
   });
