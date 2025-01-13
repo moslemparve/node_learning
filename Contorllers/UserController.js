@@ -1,6 +1,7 @@
 // userController.js
 import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongodb';
+import User from '../Models/User.js';
 
 export const welcomeMessage = (req, res) => {
   res.json({ message: 'Welcome to the node js' });
@@ -19,17 +20,12 @@ export const createUser = async (req, res,db) => {
   
   const { name, age } = req.body;
 
-  try {
-    const collection = db.collection('users'); 
-    // const result = await collection.insertOne({ name, age }); 
+    const newUser = new User({ name, age });
+    await newUser.save();
     res.status(201).json({
       message: 'User inserted successfully',
-      userId: result.insertedId,
     });
-  } catch (error) {
-    console.error('Error inserting user:', error);
-    res.status(500).json({ error: 'Failed to insert user' });
-  }
+
 };
 
 export const  getUser = async (req, res ,db) => {
