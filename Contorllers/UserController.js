@@ -8,7 +8,7 @@ export const welcomeMessage = (req, res) => {
 };
 
 export const getUsers = async (req, res,db) => {
-    const users = await db.collection('users').find({}).toArray();
+    const users = await User.find({});
     return res.status(200).json(users);
 };
 
@@ -31,20 +31,16 @@ export const createUser = async (req, res,db) => {
 export const  getUser = async (req, res ,db) => {
     const userId = req.params.id;
 
-    // Validate the user ID
     if (!ObjectId.isValid(userId)) {
       return res.status(400).json({ message: 'Invalid user ID' });
     }
 
-    // Find the user by ID
-    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+    const user = await User.findOne({ _id: new ObjectId(userId) });
 
-    // Check if the user exists
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Return the user data
     res.status(200).json(user);
 
 }
@@ -59,12 +55,12 @@ export const updateUser = async (req, res, db) => {
   if (!ObjectId.isValid(userId)) {
     return res.status(400).json({ message: 'Invalid user ID' });
   }
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { name, age },
+    { new: true, runValidators: true }
+  );
 
-    const collection = db.collection('users');
-   await collection.findOneAndUpdate(
-      { _id: new ObjectId(userId) },
-      { $set: { name, age } },
-    );
     return res.status(200).json({ message: 'User updated successfully'});
  
 }
@@ -74,10 +70,7 @@ export const deleteUser = async (req, res, db) => {
   if (!ObjectId.isValid(userId)) {
     return res.status(400).json({ message: 'Invalid user ID' });
   }
-
-  const collection = db.collection('users');
-  const result = await collection.deleteOne({ _id: new ObjectId(userId) });
-
+  const newUser =  await User.deleteOne({_id: new ObjectId(userId)});
 
     return res.status(200).json({ message: 'User deleted successfully' });
 
