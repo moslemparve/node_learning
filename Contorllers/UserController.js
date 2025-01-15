@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import User from '../Models/User.js';
 
 export const welcomeMessage = (req, res) => {
-  res.json({ message: 'Welcome to the node js' });
+  res.json({ message: 'Welcome to node js' });
 };
 
 export const getUsers = async (req, res,db) => {
