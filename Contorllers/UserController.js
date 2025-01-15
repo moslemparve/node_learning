@@ -13,18 +13,20 @@ export const getUsers = async (req, res,db) => {
 };
 
 export const createUser = async (req, res,db) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  
-  const { name, age } = req.body;
 
+  const { name, age } = req.body;
+  try {
     const newUser = new User({ name, age });
     await newUser.save();
-    res.status(201).json({
-      message: 'User inserted successfully',
-    });
+    return res.status(201).json(newUser);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => ({ msg: err.message, path: err.path }));
+      return res.status(400).json({ errors });
+    }
+    return res.status(500).json({ errors: [{ msg: error.message }] });
+  }
+   
 
 };
 
@@ -55,13 +57,21 @@ export const updateUser = async (req, res, db) => {
   if (!ObjectId.isValid(userId)) {
     return res.status(400).json({ message: 'Invalid user ID' });
   }
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    { name, age },
-    { new: true, runValidators: true }
-  );
-
+  try {
+    const existingUser = await User.findById(userId);
+    existingUser.name = name;
+    existingUser.age = age;
+    await existingUser.save();
     return res.status(200).json({ message: 'User updated successfully'});
+
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => ({ msg: err.message, path: err.path }));
+      return res.status(400).json({ errors });
+    }
+    return res.status(500).json({ errors: [{ msg: error.message }] });
+  }
+
  
 }
 export const deleteUser = async (req, res, db) => {
