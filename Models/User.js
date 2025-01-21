@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'Name is required'],
+    required:  'Name is required !',
     minlength: [3, 'Name must be at least 3 characters long'],
     maxlength: [50, 'Name must be less than 50 characters long'],
     validate: {
@@ -16,9 +16,19 @@ const userSchema = new mongoose.Schema({
   },
   age: {
     type: Number,
-    required: [true, 'Age is required'],
+    required: 'Age is required !',
     min: [1, 'Age must be a positive integer'],
     max: [120, 'Age must be less than 120']
+  },
+  file: {
+    type: String,
+    required: 'File is required!',
+    validate: {
+      validator: function(value) {
+        return value != null && value !== '';
+      },
+      message: 'File is required!'
+    }
   }
 });
 

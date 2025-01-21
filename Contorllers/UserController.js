@@ -2,6 +2,24 @@
 import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongodb';
 import User from '../Models/User.js';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage }).single('file');
 
 export const welcomeMessage = (req, res) => {
   res.json({ message: 'Welcome to node js' });
@@ -15,8 +33,11 @@ export const getUsers = async (req, res,db) => {
 export const createUser = async (req, res,db) => {
 
   const { name, age } = req.body;
+  const file = req.file;
+  const filePath = file ? file.path : null;
+
   try {
-    const newUser = new User({ name, age });
+    const newUser = new User({ name, age ,file:filePath});
     await newUser.save();
     return res.status(201).json(newUser);
   } catch (error) {
