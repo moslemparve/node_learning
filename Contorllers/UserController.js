@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongodb';
 import User from '../Models/User.js';
 import fs from 'fs/promises';
+import path from 'path';
 
 
 export const welcomeMessage = (req, res) => {
@@ -17,12 +18,15 @@ export const getUsers = async (req, res,db) => {
 export const createUser = async (req, res,db) => {
 
   const { name, age } = req.body;
-  const file = req.file;
-  const filePath = file ? file.path : null;
-
+  const file = req.files ? req.files.file : null;
+  const filePath = file ? `uploads/${Date.now()}${path.extname(file.name)}` : null;
   try {
+
     const newUser = new User({ name, age ,file:filePath});
     await newUser.save();
+    if (file) {
+      await file.mv(filePath);
+    }
     return res.status(201).json(newUser);
   } catch (error) {
     if (filePath) {
