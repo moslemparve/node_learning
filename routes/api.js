@@ -3,7 +3,6 @@ import { welcomeMessage, getUsers, createUser ,getUser,updateUser,deleteUser } f
 import UserValidation from '../Validations/UserValidaation.js';
 import adminMiddleware from '../Middleware/adminMiddleware.js';
 import connectToDatabase from '../db.js';
-import multer from 'multer';
 
 const router = Router();
 connectToDatabase();

@@ -29,13 +29,6 @@ export const createUser = async (req, res,db) => {
     }
     return res.status(201).json(newUser);
   } catch (error) {
-    if (filePath) {
-      try {
-        await fs.unlink(filePath);
-      } catch (err) {
-        console.error('Failed to delete file:', err);
-      }
-    }
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => ({ msg: err.message, path: err.path }));
       return res.status(400).json({ errors });
