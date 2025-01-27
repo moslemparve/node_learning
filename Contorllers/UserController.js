@@ -2,24 +2,8 @@
 import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongodb';
 import User from '../Models/User.js';
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import fs from 'fs/promises';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  }
-});
-
-const upload = multer({ storage }).single('file');
 
 export const welcomeMessage = (req, res) => {
   res.json({ message: 'Welcome to node js' });
@@ -41,6 +25,13 @@ export const createUser = async (req, res,db) => {
     await newUser.save();
     return res.status(201).json(newUser);
   } catch (error) {
+    if (filePath) {
+      try {
+        await fs.unlink(filePath);
+      } catch (err) {
+        console.error('Failed to delete file:', err);
+      }
+    }
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => ({ msg: err.message, path: err.path }));
       return res.status(400).json({ errors });
