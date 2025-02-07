@@ -12,6 +12,7 @@ const PORT = 5000;
 app.use(fileUpload({
   createParentPath: true
 }));
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(cors());

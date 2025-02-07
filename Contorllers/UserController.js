@@ -2,8 +2,12 @@
 import { ObjectId } from 'mongodb';
 import User from '../Models/User.js';
 import path from 'path';
+import fs from 'fs/promises';
+import { fileURLToPath } from 'url';
 
-
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const welcomeMessage = (req, res) => {
   res.json({ message: 'Welcome to node js' });
 };
@@ -57,11 +61,27 @@ export const updateUser = async (req, res, db) => {
  
   const userId = req.params.id;
   const { name, age } = req.body;
+  const file = req.files ? req.files.file : null;
+  const filePath = file ? `uploads/${Date.now()}${path.extname(file.name)}` : null;
+  
   if (!ObjectId.isValid(userId)) {
     return res.status(400).json({ message: 'Invalid user ID' });
   }
   try {
     const existingUser = await User.findById(userId);
+    if (file) {
+      if (existingUser.file) {
+        try {
+          await fs.unlink(path.join(__dirname, '..', existingUser.file));
+        } catch (err) {
+          console.error('Failed to delete old file:', err);
+        }
+      }
+
+      await file.mv(filePath);
+      existingUser.file = filePath;
+    }
+
     existingUser.name = name;
     existingUser.age = age;
     await existingUser.save();
