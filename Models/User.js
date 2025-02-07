@@ -22,13 +22,7 @@ const userSchema = new mongoose.Schema({
   },
   file: {
     type: String,
-    required: 'File is required!',
-    validate: {
-      validator: function(value) {
-        return value != null && value !== '';
-      },
-      message: 'File is required!'
-    }
+    required: 'File is required!'
   }
 });
 

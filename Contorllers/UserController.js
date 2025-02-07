@@ -1,8 +1,6 @@
 // userController.js
-import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongodb';
 import User from '../Models/User.js';
-import fs from 'fs/promises';
 import path from 'path';
 
 
@@ -46,7 +44,7 @@ export const  getUser = async (req, res ,db) => {
       return res.status(400).json({ message: 'Invalid user ID' });
     }
 
-    const user = await User.findOne({ _id: new ObjectId(userId) });
+    const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -56,11 +54,7 @@ export const  getUser = async (req, res ,db) => {
 
 }
 export const updateUser = async (req, res, db) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
+ 
   const userId = req.params.id;
   const { name, age } = req.body;
   if (!ObjectId.isValid(userId)) {
